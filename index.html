@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #000000;
+        }
+        h1 {
+            color: rgb(255, 255, 255); /* Main title text color */
+        }
+        .calculator {
+            display: inline-block;
+            margin: 50px;
+            padding: 20px;
+            width: 250px;
+            border: 1px solid #ddd;
+            background-color: #242323;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .calculator img {
+            width: 60px;
+            height: 60px;
+        }
+        .calculator h3 {
+            margin: 10px 0;
+            color: rgb(255, 255, 255);
+        }
+        .calculator h4 {
+            margin: 8px 0;
+            font-size: 12px;
+            color: rgb(153, 153, 153);
+        }
+        .calculator button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #32A44B; /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove button border */
+            border-radius: 10px;
+        }
+        .calculator button:hover {
+            background-color: #2D532F; /* Button background color on hover */
+        }
+        .main-subheading {
+            font-size: 25px;
+            color: rgb(153, 153, 153);
+            margin-top: -10px; /* Adjusts space between the title and subheading */
+            margin-bottom: 30px; /* Adjusts space below the subheading */
+        }
+    </style>
+</head>
+<body>
+    <h1>Confused with numbers?</h1>
+    <h2 class="main-subheading">Try our easy calculators!</h2>
+    <div class="calculator" onclick="openCalculator('fdCalculator')">
+        <img src="fd.png" alt="FD Calculator">
+        <h3>Fixed Deposits</h3>
+        <h4>Quickly estimate returns on fixed<br>deposit investments for better<br>financial planning.</h4>
+        <button>Calculate</button>
+    </div>
+
+    <div class="calculator" onclick="openCalculator('sipCalculator')">
+        <img src="sip.png" alt="SIP Calculator">
+        <h3>SIP</h3>
+        <h4>Calculate potential returns from <br>systematic investment plans (SIP)<br>based on current trends.</h4>
+        <button>Calculate</button>
+    </div>
+
+    <div class="calculator" onclick="openCalculator('lumpsumCalculator')">
+        <img src="lumpsum.png" alt="Lumpsum Calculator">
+        <h3>Lumpsum</h3>
+        <h4>Evaluate the future value of a<br>one-time investment based<br>on current trends.</h4>
+        <button>Calculate</button>
+    </div>
+
+    <div class="calculator" onclick="openCalculator('emiCalculator')">
+        <img src="emi.png" alt="EMI Calculator">
+        <h3>EMI</h3>
+        <h4>Compute potential monthly installments<br>for your loans basis duration and<br>rate of interest.</h4>
+        <button>Calculate</button>
+    </div>
+
+    <div class="calculator" onclick="openCalculator('ciCalculator')">
+        <img src="ci.png" alt="Compound Interest Calculator">
+        <h3>Compound Interest</h3>
+        <h4>Calculate accumulated returns<br>to visualise the power<br>of compounding.</h4>
+        <button>Calculate</button>
+    </div>
+
+    <div class="calculator" onclick="openCalculator('siCalculator')">
+        <img src="si.png" alt="Simple Interest Calculator">
+        <h3>Simple Interest</h3>
+        <h4>Easily determine interest amount by<br> inputting principal, interest rate,<br>and loan duration.</h4>
+        <button>Calculate</button>
+    </div>
+    <!-- Add more calculators as needed -->
+    
+    <script>
+        function openCalculator(calculatorName) {
+            window.location.href = `calculator.html?type=${calculatorName}`;
+        }
+    </script>
+</body>
+</html>

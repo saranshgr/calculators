@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: black;
+        }
+        h1 {
+            color: rgb(255, 255, 255); /* Main title text color */
+        }
+        .slider-container {
+            display: inline-block;
+            margin: 20px 10px;
+            color: white;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            width: 250px;
+        }
+        label {
+            margin-top: 10px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="range"] {
+            width: 200px;
+            margin: 0 10px;
+            background-color: #555; /* Slider track color */
+            border-radius: 10px;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #66D16C; /* Slider thumb color */
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type="number"] {
+            width: 100px;
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 5px;
+            color: white;
+            background-color: #333; /* Number input background color */
+            border: 1px solid #444; /* Number input border color */
+            border-radius: 5px;
+        }
+        .output-container {
+            margin-top: 30px;
+            height: 300px
+        }
+        #pieChart {
+            width: 30%;
+            height: 30%;
+            margin: 0 auto;
+        }
+        .label-item {
+            margin: 5px 0;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="calculatorTitle">Calculator</h1>
+    <div id="slidersContainer">
+        <!-- Sliders will be dynamically inserted here -->
+    </div>
+    
+    <div class="output-container">
+        <canvas id="pieChart" class="pie-chart"></canvas>
+        <div id="labelContainer"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const calculatorType = urlParams.get('type');
+
+        const calculatorData = {
+            fdCalculator: {
+                title: 'Fixed Deposit Returns Calculator',
+                inputs: ['Total Investment','Interest Rate','Time Period'],
+                min_limit: [5000,1,1],
+                max_limit: [10000000,30,25],
+                symbol: ['INR','%','yrs'],
+                formulas: (values) => {
+                    const investment = values[0];
+                    const ret = investment*((1+(values[1]/100))**values[2]) - investment;
+                    return {
+                        labels: ['Total Investment', 'Return'],
+                        values: [investment, ret],
+                        colors: ['#32A44B', '#66D16C']
+                    };
+                }
+
+            },
+            sipCalculator: {
+                title: 'SIP Calculator',
+                inputs: ['Monthly Investment','Expected Return(XIRR)','Time Period'],
+                min_limit: [1000,1,1],
+                max_limit: [10000000,50,30],
+                symbol: ['INR','%','yrs'],
+                formulas: (values) => {
+                    const invested = values[0]*(values[2]*12);
+                    const ret = values[0]*(1+(values[1]/1200))*(1200/values[1])*(((1+(values[1]/1200))**(values[2]*12))-1) - invested;
+                    return {
+                        labels: ['Invested', 'Estimated Return'],
+                        values: [invested, ret],
+                        colors: ['#32A44B', '#66D16C']
+                    };
+                }
+
+            },
+            lumpsumCalculator: {
+                title: 'Lumpsum Calculator',
+                inputs: ['Total Investment','Expected Return(XIRR)','Time Period'],
+                min_limit: [1000,1,1],
+                max_limit: [10000000,50,30],
+                symbol: ['INR','%','yrs'],
+                formulas: (values) => {
+                    const invested = values[0];
+                    const ret= invested*((1+(values[1]/100))**(values[2])) - invested;
+                    return {
+                        labels: ['Invested', 'Estimated Return'],
+                        values: [invested, ret],
+                        colors: ['#32A44B', '#66D16C']
+                    };
+                }
+
+            },
+            emiCalculator: {
+                title: 'EMI Calculator',
+                inputs: ['Loan Amount','Interest Rate','Loan Tenure'],
+                min_limit: [100000,1,1],
+                max_limit: [10000000,30,30],
+                symbol: ['INR','%','yrs'],
+                formulas: (values) => {
+                    const principal = values[0];
+                    const monthly_rate = values[1]/1200;
+                    const time = values[2]*12;
+                    const emi = (principal*monthly_rate*((1+monthly_rate)**time))/(((1+monthly_rate)**(time))-1);
+                    const interest = (emi*time)-principal;
+                    return {
+                        labels: ['Principal Amount', 'Interest Amount', 'Monthly EMI'],
+                        values: [principal, interest, emi],
+                        colors: ['#32A44B','#346B37', '#66D16C']
+                    };
+                }
+
+            },
+            siCalculator: {
+                title: 'Simple Interest Calculator',
+                inputs: ['Principal Amount','Interest Rate','Time Period'],
+                min_limit: [1000,1,1],
+                max_limit: [10000000,50,30],
+                symbol: ['INR','%','yrs'],
+                formulas: (values) => {
+                    const principal=values[0];
+                    const interest=principal*values[1]*values[2]/100;
+                    return {
+                        labels: ['Principal Amount', 'Total Interest'],
+                        values: [principal, interest],
+                        colors: ['#32A44B', '#66D16C']
+                    };
+                }
+
+            },
+            ciCalculator: {
+                title: 'Compound Interest Calculator',
+                inputs: ['Principal Amount','Interest Rate','Time Period'],
+                min_limit: [1000,1,1],
+                max_limit: [10000000,50,30],
+                symbol: ['INR','%','yrs'],
+                formulas: (values) => {
+                    const principal=values[0];
+                    const interest= (principal*((1+(values[1]/100))**(values[2]))) - principal
+                    return {
+                        labels: ['Principal Amount', 'Total Interest'],
+                        values: [principal, interest],
+                        colors: ['#32A44B', '#66D16C']
+                    };
+                }
+
+            }
+            // Add more calculators with their inputs and formulas
+        };
+
+        const selectedCalculator = calculatorData[calculatorType];
+
+        if (selectedCalculator) {
+            document.getElementById('calculatorTitle').innerText = selectedCalculator.title;
+            const max_limit=selectedCalculator.max_limit
+            const min_limit=selectedCalculator.min_limit
+
+            selectedCalculator.inputs.forEach((input, index) => {
+                const sliderContainer = document.createElement('div');
+                sliderContainer.className = 'slider-container';
+                
+                const label = document.createElement('label');
+                label.innerText = `${input}: `;
+                
+                const slider = document.createElement('input');
+                slider.type = 'range';
+                slider.min = '0';
+                slider.max = '100';
+                slider.value = '50';
+                slider.oninput = updateChart;
+                
+                const numberInput = document.createElement('input');
+                numberInput.type = 'number';
+                numberInput.value = (50*(max_limit[index]-min_limit[index])/100)+min_limit[index];
+                numberInput.oninput = updateChart;
+
+                const sym= document.createElement('symbol')
+                sym.innerText=`  ${selectedCalculator.symbol[index]}`;
+
+                slider.oninput = function () {
+                    numberInput.value = (slider.value*(max_limit[index]-min_limit[index])/100)+min_limit[index];
+                    updateChart();
+                };
+
+                numberInput.oninput = function () {
+                    slider.value = (numberInput.value-min_limit[index])*100/(max_limit[index]-min_limit[index]);
+                    updateChart();
+                };
+
+                sliderContainer.appendChild(label);
+                sliderContainer.appendChild(slider);
+                sliderContainer.appendChild(numberInput);
+                sliderContainer.appendChild(sym);
+                document.getElementById('slidersContainer').appendChild(sliderContainer);
+            });
+        }
+
+        function updateChart() {
+            const inputValues = Array.from(document.querySelectorAll('.slider-container input[type="number"]'))
+                                      .map(input => parseFloat(input.value));
+            const result = selectedCalculator.formulas(inputValues);
+
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            if (window.pie) window.pie.destroy();
+            window.pie = new Chart(ctx, {
+                type: 'doughnut', // Change to doughnut for a donut chart
+                data: {
+                    labels: result.labels,
+                    datasets: [{
+                        data: result.values,
+                        backgroundColor: result.colors,
+                        borderWidth: 0 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '50%', // Adjust for donut hole size
+                    plugins: {
+                        legend: {
+                            display: false // Remove inbuilt labels
+                        }
+                    }
+                }
+            });
+
+            const labelContainer = document.getElementById('labelContainer');
+            labelContainer.innerHTML = '';
+            result.labels.forEach((label, index) => {
+                const labelItem = document.createElement('div');
+                labelItem.className = 'label-item';
+                labelItem.innerHTML = `<span style="color:${result.colors[index]}">■</span> ${label}: ₹ ${Math.round(result.values[index]).toLocaleString('en-IN')}`;
+                labelContainer.appendChild(labelItem);
+            });
+        }
+
+        window.onload = updateChart;
+    </script>
+</body>
+</html>

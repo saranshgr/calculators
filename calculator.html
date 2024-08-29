@@ -14,6 +14,11 @@
         h1 {
             color: rgb(255, 255, 255); /* Main title text color */
         }
+        h3 {
+            font-size: 15px;
+            margin-top: 60px;
+            color: #32A44B; /* Main title text color */
+        }
         .slider-container {
             display: inline-block;
             margin: 20px 10px;
@@ -71,6 +76,7 @@
     </style>
 </head>
 <body>
+    <img width="120px" height="120px" src="logo_.png"/>
     <h1 id="calculatorTitle">Calculator</h1>
     <div id="slidersContainer">
         <!-- Sliders will be dynamically inserted here -->
@@ -80,6 +86,9 @@
         <canvas id="pieChart" class="pie-chart"></canvas>
         <div id="labelContainer"></div>
     </div>
+    <a href="https://rrabbit.io/calculators">
+        <h3 id="backButton">Back</h3>
+    </a>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
